@@ -2,6 +2,9 @@ package UDP;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class ServerUDP {
     
@@ -11,7 +14,22 @@ public class ServerUDP {
     int clientPort; // port of client
     byte[] imageByteArray; // The array that holds the bytes obtained from reading an image from our local file system
     byte[] fromClientBuffer; // Buffer to receive datagram packet from client when a message is sent
+    public int[] shuffledIndices() {
+        Integer[] memeArray = {1,2,3,4,5,6,7,8,9,10};
+        List<Integer> memeList = Arrays.asList(memeArray);
+        Collections.shuffle(memeList);
 
+        memeList.toArray(memeArray);
+        int[] memeArr = new int[10];
+
+        int i = 0;
+        for (Integer num : memeList) {
+            memeArr[i] = num;
+            i++;
+        }
+        System.out.println(memeArr);
+        return memeArr;
+    }
     public ServerUDP(int port) throws IOException {
         //Initialize Server
         serverSocket = new DatagramSocket(port);
@@ -32,9 +50,14 @@ public class ServerUDP {
         // Now that we have client info, we can target them and start sending packets
         // We have to do this for each image 🥹🥹🥹
         // Why are my emojis italic?
-
-        for (int i = 1; i < 11; i++) {
-
+        
+        // I just noticed that one of the steps is to randomize the image being sent
+        // So I'm going to go ahead and shuffle an array of the indices, using a technique I read about
+        // on a DigitalOcean Community Blog post. Link is the following: https://www.digitalocean.com/community/tutorials/shuffle-array-java
+        int[] randomMeme = shuffledIndices();
+        for (int h = 0; h < 10; h++) {
+            // What are we doing here? We are mapping j -> 0 thru 9 to a number 1 -> 10. This mapping is 1-to-1
+            int i = randomMeme[h];
             imageByteArray = Files.readAllBytes(Path.of(System.getProperty("user.dir") + "/" + "meme-" + i +".jpg" ));
             // Split the data into packets
             // essentially, we are dividing the length of the byte array into kb-sized packets (we Math.ceil() our number since we can only send whole packets)

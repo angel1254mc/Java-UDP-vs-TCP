@@ -2,6 +2,9 @@ package TCP;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class ServerTCP {
     
@@ -11,7 +14,22 @@ public class ServerTCP {
     OutputStream imageToClient; // Used to output the image byteArray as an output stream over to the client
     PrintWriter textToClient; // Used to output text messages to the client :)
     byte[] imageData; // The array that holds the bytes obtained from reading an image from our local file system
+    public int[] shuffledIndices() {
+        Integer[] memeArray = {1,2,3,4,5,6,7,8,9,10};
+        List<Integer> memeList = Arrays.asList(memeArray);
+        Collections.shuffle(memeList);
 
+        memeList.toArray(memeArray);
+        int[] memeArr = new int[10];
+
+        int i = 0;
+        for (Integer num : memeList) {
+            memeArr[i] = num;
+            i++;
+        }
+        System.out.println(memeArr);
+        return memeArr;
+    }
     public ServerTCP(int port) throws IOException {
         
         // First, initialize all our member variables
@@ -31,8 +49,12 @@ public class ServerTCP {
             throw new IOException("Error: Server registered issue in initial client response- see line 26 of code");
         }
         System.out.println("Client Ready for Images");
-        for (int i = 1; i < 11; i++) {
+
+
+        int[] randomMeme = shuffledIndices();
+        for (int h = 0; h < 10; h++) {
             // get the current imageName
+            int i = randomMeme[h];
             String imageName = "meme-" + i + ".jpg";
             // send that name to the client
             textToClient.println(imageName);
