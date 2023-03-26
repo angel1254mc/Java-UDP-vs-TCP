@@ -63,6 +63,8 @@ public class ServerTCP {
             String imageName = "meme-" + i + ".jpg";
             // send that name to the client
             textToClient.println(imageName);
+            // Confirm Client Received it
+            fromClient.readLine();
             // Try reading the image from the local directory (Also start measure 3 here)
             long measure3Start = System.currentTimeMillis();
             imageData = Files.readAllBytes(Path.of(System.getProperty("user.dir") + "/" + imageName ));

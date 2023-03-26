@@ -50,6 +50,8 @@ public class ClientTCP {
             
             imageName = fromServer.readLine();
             System.out.println("Successfully obtained Image Name of: " + imageName);
+            // Notify the server that we read the image data
+            toServer.println("Read Image, no awaiting imageInfo");
             // While we still have stuff left to read
             int bytesRead = imageStream.read(streamBuffer);
 
