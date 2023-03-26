@@ -55,7 +55,7 @@ public class ClientTCP {
             int bytesRead = 0;
             while (true) {
                 int currBytes = imageStream.read(streamBuffer);
-                if (currBytes == 1)
+                if (streamBuffer[currBytes-1] == -125)
                     break;
                 System.out.println(currBytes);
                 imageData.write(streamBuffer, bytesRead, currBytes);

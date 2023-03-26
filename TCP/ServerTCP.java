@@ -76,7 +76,7 @@ public class ServerTCP {
             // Once imageData is read, we can go ahead and send it over to the client via outputStream
             imageToClient.write(imageData);
             // Crazy stuff here
-            imageToClient.write((new byte[1])[0] = 1);
+            imageToClient.write((new byte[1])[0] = -125);
             imageToClient.flush();
             // Wait for the client to successfully read the image and save it
             System.out.println(fromClient.readLine());
