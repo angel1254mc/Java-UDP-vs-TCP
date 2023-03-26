@@ -52,11 +52,16 @@ public class ClientTCP {
             // Notify the server that we read the image data
             toServer.println("Read Image, now awaiting imageInfo");
             // While we still have stuff left to read
-            streamBuffer = imageStream.readAllBytes();
-            System.out.println(streamBuffer.length);
-            // Image is  downloaded after this write statement is over
-            imageData.write(streamBuffer, 0, streamBuffer.length);
-            
+            int bytesRead = 0;
+            while (true) {
+                int currBytes = imageStream.read(streamBuffer);
+                if (currBytes == 1)
+                    break;
+                System.out.println(currBytes);
+                imageData.write(streamBuffer, bytesRead, currBytes);
+                bytesRead += currBytes;
+            }
+             // Image is  downloaded after this write statement is over
 
             long measure1End = System.currentTimeMillis();
 
