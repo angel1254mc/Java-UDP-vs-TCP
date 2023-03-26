@@ -57,7 +57,7 @@ public class ClientTCP {
                 int currBytes = imageStream.read(streamBuffer);
                 if (streamBuffer[currBytes-1] == -125) {
                     // OHHH MY GOODNESS YOU ARE NOW WATCHING A MASTER AT WORK
-                    imageData.write(streamBuffer, bytesRead, currBytes - 1);
+                    imageData.write(streamBuffer, bytesRead, currBytes);
                     bytesRead += currBytes;
             
                     break;
@@ -66,6 +66,7 @@ public class ClientTCP {
                 imageData.write(streamBuffer, bytesRead, currBytes);
                 bytesRead += currBytes;
             }
+            System.out.println(bytesRead);
              // Image is  downloaded after this write statement is over
 
             long measure1End = System.currentTimeMillis();
