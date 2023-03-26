@@ -68,11 +68,12 @@ public class ServerTCP {
             long measure3Start = System.currentTimeMillis();
             imageData = Files.readAllBytes(Path.of(System.getProperty("user.dir") + "/" + imageName ));
             long measure3End = System.currentTimeMillis();
-
+            
             // Save the measurement to measure array
             measure3Milli[h] = measure3End - measure3Start;
 
             System.out.println("Reading " + imageName);
+            System.out.println(imageData.length);
             // Once imageData is read, we can go ahead and send it over to the client via outputStream
             imageToClient.write(imageData);
             // Crazy stuff here
