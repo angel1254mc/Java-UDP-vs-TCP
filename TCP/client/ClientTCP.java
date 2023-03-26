@@ -52,10 +52,10 @@ public class ClientTCP {
             // Notify the server that we read the image data
             toServer.println("Read Image, now awaiting imageInfo");
             // While we still have stuff left to read
-            int bytesRead = imageStream.read(streamBuffer);
-            System.out.println(bytesRead);
+            streamBuffer = imageStream.readAllBytes();
+            System.out.println(streamBuffer.length);
             // Image is  downloaded after this write statement is over
-            imageData.write(streamBuffer, 0, bytesRead);
+            imageData.write(streamBuffer, 0, streamBuffer.length);
             
 
             long measure1End = System.currentTimeMillis();
@@ -132,20 +132,3 @@ public class ClientTCP {
     }
 }
 
-/**
- * int bytesRead = 0;
- * 
- * while ((bytesRead = imageStream.read(streamBuffer)) != -1) {
-                // Write this stuff into our imageData output stream
-                System.out.println("Hello");
-                System.out.println(bytesRead);
-                imageData.write(streamBuffer, 0, bytesRead);
-            }
-
-                    /**
-         * Essentially what we are doing is reading the inputStream until it can no longer be read.
-         * We do this by loading what we read from the inputStream into our buffer array, streamBuffer.
-         * This function inputStream.read(content) actually returns an integer denoting the bytes read at that instance
-         * When this function returns -1, we know that no bytes were read as we are at the end of our stream, thus there
-         * is no more image to read, thus we can stop :)
-         */
