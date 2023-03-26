@@ -8,6 +8,7 @@ import java.util.List;
 
 public class ServerUDP {
     
+    long[] measure3Milli = new long[10];
     DatagramSocket serverSocket; // Establish the server socket (UDP)
     DatagramPacket clientPacket; // Holder for packet to be received by the client
     InetAddress clientAddress; // Address/IP of client
@@ -56,9 +57,17 @@ public class ServerUDP {
         // on a DigitalOcean Community Blog post. Link is the following: https://www.digitalocean.com/community/tutorials/shuffle-array-java
         int[] randomMeme = shuffledIndices();
         for (int h = 0; h < 10; h++) {
-            // What are we doing here? We are mapping j -> 0 thru 9 to a number 1 -> 10. This mapping is 1-to-1
+            // What are we doing here? We are mapping j -> 0 thru 9 to a RANDOM number 1 -> 10. This mapping is 1-to-1. This ensures that we never grab
+            // images in the same order and bypass the Server's file caching mechanism to accurately measure file access time
             int i = randomMeme[h];
+
+            // Im going to start measure3 here and end it right after this line
+            long measure3Start = System.currentTimeMillis();
             imageByteArray = Files.readAllBytes(Path.of(System.getProperty("user.dir") + "/" + "meme-" + i +".jpg" ));
+            long measure3End = System.currentTimeMillis();
+            // Populate our measure3 Array
+            measure3Milli[h] = measure3End - measure3Start;
+
             // Split the data into packets
             // essentially, we are dividing the length of the byte array into kb-sized packets (we Math.ceil() our number since we can only send whole packets)
             int totalPackets = (int)Math.ceil((double) imageByteArray.length / 1024);
@@ -86,9 +95,43 @@ public class ServerUDP {
 
         serverSocket.close();
     }
+
+    public void printStats() {
+        System.out.println("Printing out Meme Access Time Data Points");
+        System.out.println("-------------------------------------------");
+        long sum = 0;
+        long max = measure3Milli[0];
+        long min = measure3Milli[0];
+        for (int i = 0; i < 10; i++) {
+            System.out.println("" + (i+1) + ": " + measure3Milli[i]);
+            sum += measure3Milli[i];
+            if (measure3Milli[i] > max)
+                max = measure3Milli[i];
+            if (measure3Milli[i] < min)
+                min = measure3Milli[i];
+        }
+
+        System.out.println("\nMeme Access Time STATS");
+        System.out.println("-------------------------------------------");
+        // Calculating out mean
+        double mean = sum / 10;
+        System.out.println("Mean: " + mean);
+        double standardDeviation = 0;
+        System.out.println("Min Value: " + min);
+        System.out.println("Max Value: " + max);
+        
+        // Calculating out the standard deviation
+        for (double num : measure3Milli) {
+            standardDeviation += Math.pow(num - mean, 2);
+        }
+        standardDeviation = Math.sqrt(standardDeviation / 10);
+
+        System.out.println("std. Deviation: " + standardDeviation);
+    }
     public static void main(String[] args) {
         try {
             ServerUDP server = new ServerUDP(3000);
+            server.printStats();
         } catch (IOException err) {
             System.out.println(err.getMessage());
         }

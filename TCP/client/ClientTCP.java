@@ -11,6 +11,8 @@ import java.util.Arrays;
 /** Importing all the necessary files */
 public class ClientTCP {
 
+    long[] measure1Milli = new long[10];
+    long measure2Milli;
     Socket clientSocket; // The client socket with which we connect to the server
     InputStream imageStream; // the input stream through which we receive data from the server
     ByteArrayOutputStream imageData; // the actual image data, which we then convert to a bytearray when writing to file
@@ -20,8 +22,11 @@ public class ClientTCP {
     String imageName; // stores the name of the current image sent to us by the server
     public ClientTCP(String IP, int port) throws IOException {
 
-        // Connect to server
+        // Connect to server (measure before and after connection occurs)
+        long measure2Start = System.currentTimeMillis();
         clientSocket = new Socket(IP, port);
+        long measure2End = System.currentTimeMillis();
+        measure2Milli = measure2End - measure2Start;
         // Listen and wait for image data by getting the input stream
         System.out.println("Successfully connected to Server");
         imageStream = clientSocket.getInputStream();
@@ -36,16 +41,27 @@ public class ClientTCP {
 
         System.out.println("Printing out success to Server");
         toServer.println("Successfully Connected. Please start sending Memes");
+
         // There are 10 images, so lets loop ten times
+        
         for (int i = 0; i < 10; i++) {
+            // Image is requested from server by above print statement
+            long measure1Start = System.currentTimeMillis();
+            
             imageName = fromServer.readLine();
             System.out.println("Successfully obtained Image Name of: " + imageName);
             // While we still have stuff left to read
             int bytesRead = imageStream.read(streamBuffer);
+
+            // Image is  downloaded after this write statement is over
             imageData.write(streamBuffer, 0, bytesRead);
             
 
-            // We can then save the image data into a file in our local directory
+            long measure1End = System.currentTimeMillis();
+
+            // Calculate the total round-trip time and save
+            measure1Milli[i] = measure1End - measure1Start;
+            // We then save it to our local dir
             Files.write(Path.of(System.getProperty("user.dir") + '/' + imageName), imageData.toByteArray());
 
             // Empty the imageData output stream to take in the next image
@@ -61,13 +77,52 @@ public class ClientTCP {
         toServer.close();
         clientSocket.close();
     }
+    public void printStats() {
+        System.out.println("TCP Setup Time: " + measure2Milli);
+        System.out.println("Printing out Total Round-Trip Time Data Points");
+        System.out.println("-------------------------------------------");
+        long sum = 0;
+        long max = measure1Milli[0];
+        long min = measure1Milli[0];
+        for (int i = 0; i < 10; i++) {
+            System.out.println("" + (i+1) + ": " + measure1Milli[i]);
+            sum += measure1Milli[i];
+            if (measure1Milli[i] > max)
+                max = measure1Milli[i];
+            if (measure1Milli[i] < min)
+                min = measure1Milli[i];
+        }
+
+        System.out.println("\nRound-Trip Time STATS");
+        System.out.println("-------------------------------------------");
+        // Calculating out mean
+        double mean = sum / 10;
+        System.out.println("Mean: " + mean);
+        double standardDeviation = 0;
+        System.out.println("Min Value: " + min);
+        System.out.println("Max Value: " + max);
+        
+        // Calculating out the standard deviation
+        for (double num : measure1Milli) {
+            standardDeviation += Math.pow(num - mean, 2);
+        }
+        standardDeviation = Math.sqrt(standardDeviation / 10);
+
+        System.out.println("std. Deviation: " + standardDeviation);
+    }
     /**
      * Main Function!
-     * @param args
+     * @param args Arry of input arguments. First one should be the IP
      */
     public static void main(String[] args) {
         try {
-            ClientTCP client = new ClientTCP("localhost", 3000);
+            ClientTCP client;
+            if (args.length != 0)
+                client = new ClientTCP(args[0], 3000);
+            else 
+                client = new ClientTCP("localhost", 3000);
+
+            client.printStats();
         } catch (IOException err) {
             System.out.println(err.getMessage());
         }
