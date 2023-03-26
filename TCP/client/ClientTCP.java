@@ -46,15 +46,14 @@ public class ClientTCP {
         
         for (int i = 0; i < 10; i++) {
             // Image is requested from server by above print statement
+            imageName = "meme-" + (i+1) + ".jpg";
             long measure1Start = System.currentTimeMillis();
             
-            imageName = fromServer.readLine();
-            System.out.println("Successfully obtained Image Name of: " + imageName);
             // Notify the server that we read the image data
-            toServer.println("Read Image, no awaiting imageInfo");
+            toServer.println("Read Image, now awaiting imageInfo");
             // While we still have stuff left to read
             int bytesRead = imageStream.read(streamBuffer);
-
+            System.out.println(bytesRead);
             // Image is  downloaded after this write statement is over
             imageData.write(streamBuffer, 0, bytesRead);
             
@@ -68,6 +67,8 @@ public class ClientTCP {
 
             // Empty the imageData output stream to take in the next image
             imageData.reset();
+            for (int k = 0; k < 100*1024; k++)
+                streamBuffer[i] = 0;
 
             toServer.println("Successfully Read Image: " + imageName);
         }

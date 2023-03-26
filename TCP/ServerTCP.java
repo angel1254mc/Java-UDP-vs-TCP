@@ -62,7 +62,6 @@ public class ServerTCP {
             int i = randomMeme[h];
             String imageName = "meme-" + i + ".jpg";
             // send that name to the client
-            textToClient.println(imageName);
             // Confirm Client Received it
             fromClient.readLine();
             // Try reading the image from the local directory (Also start measure 3 here)
@@ -78,8 +77,8 @@ public class ServerTCP {
             imageToClient.write(imageData);
             imageToClient.flush();
             // Wait for the client to successfully read the image and save it
-            if (!(fromClient.readLine().contains("Success")))
-                throw new IOException("Error: Client was not able to succcessfully read and save the image of imageName: " + imageName);
+            System.out.println(fromClient.readLine());
+            
         }
         try {
             wait(1000);
