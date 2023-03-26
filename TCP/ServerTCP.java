@@ -15,6 +15,7 @@ public class ServerTCP {
     OutputStream imageToClient; // Used to output the image byteArray as an output stream over to the client
     PrintWriter textToClient; // Used to output text messages to the client :)
     byte[] imageData; // The array that holds the bytes obtained from reading an image from our local file system
+    
     public int[] shuffledIndices() {
         Integer[] memeArray = {1,2,3,4,5,6,7,8,9,10};
         List<Integer> memeList = Arrays.asList(memeArray);
