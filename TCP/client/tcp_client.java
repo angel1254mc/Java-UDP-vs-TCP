@@ -49,20 +49,25 @@ public class tcp_client {
         for (int i = 0; i < 10; i++) {
             // Image is requested from server by above print statement
             imageName = "meme-" + (i+1) + ".jpg";
-            long measure1Start = System.currentTimeMillis();
             
             // Notify the server that we read the image data
             toServer.println("Read Image, now awaiting imageInfo");
+            long measure1Start = System.currentTimeMillis();
             
             String size = fromServer.readLine();
-            System.out.println(size);
+            
             // While we still have stuff left to read
             toServer.println();
-            int bytesRead = imageStream.read();
+            int totalBytes = 0;
+            while (totalBytes < Integer.parseInt(size)) {
+                streamBuffer[totalBytes] = (byte) imageStream.read();
+                totalBytes++;
+            }
             
+            // Image is  downloaded after the ImageIO read statement is over
+            ByteArrayInputStream byteArrayBuffer = new ByteArrayInputStream(streamBuffer);
+            BufferedImage image = ImageIO.read(byteArrayBuffer);
             
-             // Image is  downloaded after this write statement is over
-            BufferedImage image = ImageIO.read(new ByteArrayInputStream(streamBuffer, 0, bytesRead));
             long measure1End = System.currentTimeMillis();
 
             // Calculate the total round-trip time and save
