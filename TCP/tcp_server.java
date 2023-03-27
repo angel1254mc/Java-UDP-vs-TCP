@@ -5,6 +5,8 @@ import java.nio.file.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.awt.image.BufferedImage;
+import javax.imageio.*;
 
 public class tcp_server {
     
@@ -14,6 +16,7 @@ public class tcp_server {
     BufferedReader fromClient; // Used to read messages sent from the client
     OutputStream imageToClient; // Used to output the image byteArray as an output stream over to the client
     PrintWriter textToClient; // Used to output text messages to the client :)
+    ByteArrayOutputStream imageStream;
     byte[] imageData; // The array that holds the bytes obtained from reading an image from our local file system
     
     public int[] shuffledIndices() {
@@ -59,25 +62,26 @@ public class tcp_server {
         int[] randomMeme = shuffledIndices();
         for (int h = 0; h < 10; h++) {
             // get the current imageName (I explain what the randomMeme )
+            imageStream = new ByteArrayOutputStream();
             int i = randomMeme[h];
             String imageName = "meme-" + i + ".jpg";
             // send that name to the client
             // Confirm Client Received it
             fromClient.readLine();
+            String path = (Path.of(System.getProperty("user.dir") + "/" + imageName )).toString();
+            System.out.println(path);
             // Try reading the image from the local directory (Also start measure 3 here)
             long measure3Start = System.currentTimeMillis();
-            imageData = Files.readAllBytes(Path.of(System.getProperty("user.dir") + "/" + imageName ));
+            ImageIO.write(ImageIO.read(new File(path)), "jpg", imageStream);
             long measure3End = System.currentTimeMillis();
             
             // Save the measurement to measure array
             measure3Milli[h] = measure3End - measure3Start;
 
             System.out.println("Reading " + imageName);
-            System.out.println(imageData.length);
+            System.out.println(imageStream.toByteArray().length);
             // Once imageData is read, we can go ahead and send it over to the client via outputStream
-            imageToClient.write(imageData);
-            // Crazy stuff here
-            imageToClient.write((new byte[1])[0] = -125);
+            imageToClient.write(imageStream.toByteArray());
             imageToClient.flush();
             // Wait for the client to successfully read the image and save it
             System.out.println(fromClient.readLine());

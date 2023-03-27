@@ -1,4 +1,5 @@
 package TCP.client;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
@@ -7,6 +8,8 @@ import java.nio.file.*;
  * Most of the functionality will be encapsulated in the Client class
  */
 import java.util.Arrays;
+
+import javax.imageio.ImageIO;
 
 /** Importing all the necessary files */
 public class tcp_client {
@@ -33,7 +36,7 @@ public class tcp_client {
         // create the ByteArrayOutputStream we need to populate with the data we get from imageStream
         imageData = new ByteArrayOutputStream();
         // Also allocate about a kylobyte for the buffer array since we expect to be sending like a kb of data per shot
-        streamBuffer = new byte[100*1024];
+        streamBuffer = new byte[1000*1024];
         // Additionally, allocate a printWriter and BufferedReader to send text messages to and from the server :)
         toServer = new PrintWriter(clientSocket.getOutputStream(), true);
         fromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -53,28 +56,22 @@ public class tcp_client {
             toServer.println("Read Image, now awaiting imageInfo");
             // While we still have stuff left to read
             int bytesRead = 0;
-            while (true) {
-                int currBytes = imageStream.read(streamBuffer);
-                if (streamBuffer[currBytes-1] == -125) {
-                    // OHHH MY GOODNESS YOU ARE NOW WATCHING A MASTER AT WORK
-                    imageData.write(streamBuffer, bytesRead, currBytes);
-                    bytesRead += currBytes;
-            
-                    break;
-                }
-                    
-                imageData.write(streamBuffer, bytesRead, currBytes);
-                bytesRead += currBytes;
-            }
+            int currBytes = imageStream.read(streamBuffer);
+
+                
+            imageData.write(streamBuffer, bytesRead, currBytes);
+            bytesRead += currBytes;
             System.out.println(bytesRead);
              // Image is  downloaded after this write statement is over
-
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(streamBuffer, 0, bytesRead));
             long measure1End = System.currentTimeMillis();
 
             // Calculate the total round-trip time and save
             measure1Milli[i] = measure1End - measure1Start;
             // We then save it to our local dir
-            Files.write(Path.of(System.getProperty("user.dir") + '/' + imageName), imageData.toByteArray());
+            String writePath = (Path.of(System.getProperty("user.dir") + '/' + imageName)).toString();
+            
+            ImageIO.write(image, "jpg", new File(writePath));
 
             // Empty the imageData output stream to take in the next image
             imageData.reset();
@@ -142,4 +139,3 @@ public class tcp_client {
         }
     }
 }
-
