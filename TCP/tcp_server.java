@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class ServerTCP {
+public class tcp_server {
     
     long[] measure3Milli = new long[10];
     ServerSocket serverSocket; // Establish the server socket
@@ -32,7 +32,7 @@ public class ServerTCP {
         System.out.println(memeArr);
         return memeArr;
     }
-    public ServerTCP(int port) throws IOException {
+    public tcp_server(int port) throws IOException {
         
         // First, initialize all our member variables
         serverSocket = new ServerSocket(port);
@@ -130,7 +130,7 @@ public class ServerTCP {
     }
     public static void main(String[] args) {
         try {
-            ServerTCP server = new ServerTCP(3000);
+            tcp_server server = new tcp_server(3000);
             server.printStats();
         } catch (IOException err) {
             System.out.println(err.getMessage());

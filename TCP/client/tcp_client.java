@@ -9,7 +9,7 @@ import java.nio.file.*;
 import java.util.Arrays;
 
 /** Importing all the necessary files */
-public class ClientTCP {
+public class tcp_client {
 
     long[] measure1Milli = new long[10];
     long measure2Milli;
@@ -20,7 +20,7 @@ public class ClientTCP {
     PrintWriter toServer; // OutputStream writer to send the server text messages
     BufferedReader fromServer; //InputStream reader to receive messages back from the server
     String imageName; // stores the name of the current image sent to us by the server
-    public ClientTCP(String IP, int port) throws IOException {
+    public tcp_client(String IP, int port) throws IOException {
 
         // Connect to server (measure before and after connection occurs)
         long measure2Start = System.currentTimeMillis();
@@ -130,11 +130,11 @@ public class ClientTCP {
      */
     public static void main(String[] args) {
         try {
-            ClientTCP client;
+            tcp_client client;
             if (args.length != 0)
-                client = new ClientTCP(args[0], 3000);
+                client = new tcp_client(args[0], 3000);
             else 
-                client = new ClientTCP("localhost", 3000);
+                client = new tcp_client("localhost", 3000);
 
             client.printStats();
         } catch (IOException err) {

@@ -3,7 +3,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.file.*;
 
-public class ClientUDP {
+public class udp_client {
 
     long[] measure1Milli = new long[10];
     long measure2Milli;
@@ -15,7 +15,7 @@ public class ClientUDP {
     byte[] toServerData;
     byte[] fromServerData;
 
-    public ClientUDP(String IP, int port) throws IOException {
+    public udp_client(String IP, int port) throws IOException {
         // Start up the client socket, the data to send to the server, and the packet we are sending it in
         clientSocket = new DatagramSocket();
         toServerData = (new String("Awesome")).getBytes();
@@ -102,11 +102,11 @@ public class ClientUDP {
     }
     public static void main(String[] args) {
         try {
-            ClientUDP client;
+            udp_client client;
             if (args.length != 0) 
-                client = new ClientUDP(args[0], 3000);
+                client = new udp_client(args[0], 3000);
             else
-                client = new ClientUDP("localhost", 3000);
+                client = new udp_client("localhost", 3000);
             client.printStats();
         } catch (IOException err) {
             System.out.println(err.getMessage());

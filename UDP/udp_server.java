@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class ServerUDP {
+public class udp_server {
     
     long[] measure3Milli = new long[10];
     DatagramSocket serverSocket; // Establish the server socket (UDP)
@@ -31,7 +31,7 @@ public class ServerUDP {
         System.out.println(memeArr);
         return memeArr;
     }
-    public ServerUDP(int port) throws IOException {
+    public udp_server(int port) throws IOException {
         //Initialize Server
         serverSocket = new DatagramSocket(port);
         fromClientBuffer = new byte[1024]; // Arbitrarily allocate a 1024 byte buffer
@@ -130,7 +130,7 @@ public class ServerUDP {
     }
     public static void main(String[] args) {
         try {
-            ServerUDP server = new ServerUDP(3000);
+            udp_server server = new udp_server(3000);
             server.printStats();
         } catch (IOException err) {
             System.out.println(err.getMessage());
