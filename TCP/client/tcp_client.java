@@ -18,7 +18,6 @@ public class tcp_client {
     long measure2Milli;
     Socket clientSocket; // The client socket with which we connect to the server
     InputStream imageStream; // the input stream through which we receive data from the server
-    ByteArrayOutputStream imageData; // the actual image data, which we then convert to a bytearray when writing to file
     byte[] streamBuffer; // Buffer to contain data as we transfer it from imageStream to imageData
     PrintWriter toServer; // OutputStream writer to send the server text messages
     BufferedReader fromServer; //InputStream reader to receive messages back from the server
@@ -34,9 +33,9 @@ public class tcp_client {
         System.out.println("Successfully connected to Server");
         imageStream = clientSocket.getInputStream();
         // create the ByteArrayOutputStream we need to populate with the data we get from imageStream
-        imageData = new ByteArrayOutputStream();
+        
         // Also allocate about a kylobyte for the buffer array since we expect to be sending like a kb of data per shot
-        streamBuffer = new byte[1000*1024];
+        streamBuffer = new byte[100*1024];
         // Additionally, allocate a printWriter and BufferedReader to send text messages to and from the server :)
         toServer = new PrintWriter(clientSocket.getOutputStream(), true);
         fromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -55,13 +54,9 @@ public class tcp_client {
             // Notify the server that we read the image data
             toServer.println("Read Image, now awaiting imageInfo");
             // While we still have stuff left to read
-            int bytesRead = 0;
-            int currBytes = imageStream.read(streamBuffer);
+            int bytesRead = imageStream.read(streamBuffer);
 
-                
-            imageData.write(streamBuffer, bytesRead, currBytes);
-            bytesRead += currBytes;
-            System.out.println(bytesRead);
+            
              // Image is  downloaded after this write statement is over
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(streamBuffer, 0, bytesRead));
             long measure1End = System.currentTimeMillis();
@@ -73,17 +68,15 @@ public class tcp_client {
             
             ImageIO.write(image, "jpg", new File(writePath));
 
-            // Empty the imageData output stream to take in the next image
-            imageData.reset();
+            // Empty our stream buffer just in case
             for (int k = 0; k < 100*1024; k++)
                 streamBuffer[i] = 0;
 
             toServer.println("Successfully Read Image: " + imageName);
         }
         
-        // Close out all the sockets
+        // Close out all the sockets and streams
         imageStream.close();
-        imageData.close();
         fromServer.close();
         toServer.close();
         clientSocket.close();
