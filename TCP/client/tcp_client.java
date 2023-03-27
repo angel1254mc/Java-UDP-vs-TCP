@@ -53,11 +53,11 @@ public class tcp_client {
             
             // Notify the server that we read the image data
             toServer.println("Read Image, now awaiting imageInfo");
-            ByteArrayOutputStream imageBuffer = new ByteArrayOutputStream();
+            
             String size = fromServer.readLine();
             System.out.println(size);
             // While we still have stuff left to read
-            
+            toServer.println();
             int bytesRead = imageStream.read();
             
             

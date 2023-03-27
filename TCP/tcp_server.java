@@ -78,7 +78,10 @@ public class tcp_server {
             measure3Milli[h] = measure3End - measure3Start;
 
             System.out.println("Reading " + imageName);
-            textToClient.write((imageStream.toByteArray().length + ""));
+
+            textToClient.println((imageStream.toByteArray().length + ""));
+            // Wait for client to receive and process the length that was sent
+            fromClient.readLine();
             // Once imageData is read, we can go ahead and send it over to the client via outputStream
             imageToClient.write(imageStream.toByteArray());
             imageToClient.flush();
