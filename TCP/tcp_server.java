@@ -65,11 +65,10 @@ public class tcp_server {
             imageStream = new ByteArrayOutputStream();
             int i = randomMeme[h];
             String imageName = "meme-" + i + ".jpg";
-            // send that name to the client
+
             // Confirm Client Received it
             fromClient.readLine();
             String path = (Path.of(System.getProperty("user.dir") + "/" + imageName )).toString();
-            System.out.println(path);
             // Try reading the image from the local directory (Also start measure 3 here)
             long measure3Start = System.currentTimeMillis();
             ImageIO.write(ImageIO.read(new File(path)), "jpg", imageStream);
@@ -79,7 +78,7 @@ public class tcp_server {
             measure3Milli[h] = measure3End - measure3Start;
 
             System.out.println("Reading " + imageName);
-            System.out.println(imageStream.toByteArray().length);
+            textToClient.write((imageStream.toByteArray().length + ""));
             // Once imageData is read, we can go ahead and send it over to the client via outputStream
             imageToClient.write(imageStream.toByteArray());
             imageToClient.flush();
